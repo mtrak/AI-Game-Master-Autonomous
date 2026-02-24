@@ -1,3 +1,6 @@
+🟥🟥🟥 "Todo este sistema se encuentra aún en fase experimental (WIP). Aunque de momento no está dando los resultados exactos que tengo en mente, sigo trabajando y avanzando un poco cada día. La meta final es ambiciosa: conseguir una IA 100% operativa y especializada en Arma Reforger, capaz de dominar tácticas militares, toma de decisiones y adaptarse a cualquier tipo de misión."
+
+"This entire system is currently in the experimental phase (Work in Progress). While it isn't delivering the exact results I have in mind just yet, I'm putting in the work and making steady progress every day. The ultimate goal is ambitious: to achieve a fully operational AI specialized in Arma Reforger, capable of mastering military tactics, smart decision-making, and adapting to any mission type."
 ================ EN ================
 ### AI Game Master Autonomous
 This mod connects your Arma Reforger server to an external Python Backend powered by an AI (Llama 3.1). The AI acts as an autonomous Game Master (Zeus), evaluating the battlefield status and dynamically spawning units and vehicles to maintain tension, completely hands-free!
