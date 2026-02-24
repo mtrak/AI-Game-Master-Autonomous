@@ -81,12 +81,37 @@ for folder in folders:
     os.makedirs(os.path.join(base_dir, folder), exist_ok=True)
 
 files = {
-    # ¡AQUI ESTA LA CORRECCION! Sin los GUIDs falsos que rompían la red.
+    # Base de datos de tropas US ARMY con GUIDS reales del juego
     r"Backend\prefabs.json": """{
-  "ussr_infantry": "Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_Rifleman.et",
-  "us_infantry": "Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_Rifleman.et",
-  "fia_infantry": "Prefabs/Characters/Factions/INDFOR/FIA/Character_FIA_Rifleman.et",
-  "ussr_btr70": "Prefabs/Vehicles/Wheeled/BTR70/BTR70.et"
+  "us_amg": "{6058AB54781A0C52}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_AMG.et",
+  "us_ammo": "{CD28EE7C5690D3BB}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_Ammo.et",
+  "us_ar": "{5B1996C05B1E51A4}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_AR.et",
+  "us_base": "{836E7E39AAC5888B}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_Base.et",
+  "us_base_loadout": "{284E735C6C70DAD2}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_BaseLoadout.et",
+  "us_cc": "{F35F145D4A3F75EF}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_CC.et",
+  "us_crew": "{E1CB513B8B9B08F4}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_Crew.et",
+  "us_engineer": "{36CCDB4556ECDA06}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_Engineer.et",
+  "us_gl": "{84029128FA6F6BB9}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_GL.et",
+  "us_helicrew": "{15CD521098748195}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_HeliCrew.et",
+  "us_helipilot": "{42A502E3BB727CEB}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_HeliPilot.et",
+  "us_lat": "{27BF1FF235DD6036}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_LAT.et",
+  "us_medic": "{C9E4FEAF5AAC8D8C}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_Medic.et",
+  "us_mg": "{1623EA3AEFACA0E4}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_MG.et",
+  "us_officer": "{DE15FB5FAFC3E63F}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_Officer.et",
+  "us_pl": "{0B3167BB0FB68110}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_PL.et",
+  "us_randomized": "{5EFC243926EE6808}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_Randomized.et",
+  "us_rifleman": "{26A9756790131354}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_Rifleman.et",
+  "us_rifleman_variant_1": "{EA158B6EB6A24B4B}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_Rifleman_Variant_1.et",
+  "us_rto": "{3726077BE60962FF}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_RTO.et",
+  "us_sapper": "{AE63E4B79FB45DD1}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_Sapper.et",
+  "us_scout": "{371FD0F920B600DD}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_Scout.et",
+  "us_scout_rto": "{E94CD0D20A63909E}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_Scout_RTO.et",
+  "us_sergeant": "{4FBA24F7BB43E17D}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_Sergeant.et",
+  "us_sl": "{E45F1E163F5CA080}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_SL.et",
+  "us_sniper": "{0F6689B491641155}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_Sniper.et",
+  "us_spotter": "{1CA3D30464EE4674}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_Spotter.et",
+  "us_tl": "{E398E44759DA1A43}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_TL.et",
+  "us_unarmed": "{2F912ED6E399FF47}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_Unarmed.et"
 }""",
 
     r"Backend\main.py": """import json
@@ -111,21 +136,22 @@ except FileNotFoundError:
 AVAILABLE_UNITS = list(PREFABS.keys())
 
 SYSTEM_PROMPT = f\"\"\"
-Eres el Game Master táctico de Arma Reforger. Genera eventos realistas.
-LIMITES: X y Z entre 3000 y 9000. Centro: X:6400, Z:6400.
-UNIDADES: {AVAILABLE_UNITS}
+Eres el Game Master táctico de Arma Reforger. Genera eventos tácticos realistas.
+Actualmente dispones EXCLUSIVAMENTE de tropas de la facción US Army.
+LIMITES DE MAPA: X y Z entre 3000 y 9000. Centro de operaciones: X:6400, Z:6400.
+UNIDADES DISPONIBLES: {AVAILABLE_UNITS}
 
-Responde SOLO con JSON:
+Responde SOLO con JSON en este formato exacto:
 {{
   "action": "spawn",
-  "unit_id": "<unidad>",
+  "unit_id": "<una_unidad_de_la_lista>",
   "spawn_x": 6400,
   "spawn_y": 500,
   "spawn_z": 6400,
   "intensity": 1,
-  "internal_thought": "Motivo"
+  "internal_thought": "Motivo de despliegue"
 }}
-IMPORTANTE: "spawn_y" debe ser SIEMPRE 500. Si no actúas, usa "action": "idle".
+IMPORTANTE: "spawn_y" debe ser SIEMPRE 500. Si decides no enviar tropas ahora, usa "action": "idle".
 \"\"\"
 
 class ManualOrder(BaseModel):
@@ -142,7 +168,7 @@ async def ask_ollama(prompt_text):
             if unit_id in PREFABS:
                 data["prefab_path"] = PREFABS[unit_id]
                 command_queue.append(data)
-                msg = f"IA: {data.get('internal_thought', 'Accion')} -> {unit_id} en X:{data.get('spawn_x')}|Y:{data.get('spawn_y')}|Z:{data.get('spawn_z')}"
+                msg = f"IA: {data.get('internal_thought', 'Despliegue tactico')} -> {unit_id} en X:{data.get('spawn_x')}|Y:{data.get('spawn_y')}|Z:{data.get('spawn_z')}"
                 action_history.append(msg)
                 print(f"[NUEVA ORDEN] {msg}")
         except Exception as e:
@@ -151,7 +177,7 @@ async def ask_ollama(prompt_text):
 async def autonomous_loop():
     while True:
         await asyncio.sleep(60)
-        await ask_ollama("Analiza y decide si enviar tropas. Varía las posiciones y usa spawn_y en 500.")
+        await ask_ollama("Analiza la situacion y decide si enviar tropas estadounidenses. Varía las posiciones y usa spawn_y en 500.")
 
 @app.on_event("startup")
 async def startup_event():
@@ -197,7 +223,7 @@ if __name__ == "__main__":
     <h1>🌐 ARMA REFORGER - AI COMMANDER</h1>
     <div class="panel">
         <h3>Manual Order</h3>
-        <input type="text" id="orderInput" placeholder="Ej: Ataca la base norte con un BTR">
+        <input type="text" id="orderInput" placeholder="Ej: Envia un francotirador (us_sniper) a las coordenadas norte">
         <button onclick="sendOrder()">SEND ORDER</button>
     </div>
     <div class="panel">
