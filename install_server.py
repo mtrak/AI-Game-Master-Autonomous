@@ -57,13 +57,11 @@ print("\n[EN] Ensuring Ollama service is running and loading 'llama3.1'...")
 print("[ES] Asegurando que el servicio Ollama está activo y cargando 'llama3.1'...")
 
 try:
-    # Intenta listar los modelos para ver si el servidor responde
     subprocess.run(["ollama", "list"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 except subprocess.CalledProcessError:
-    # Si falla, significa que el servicio no está corriendo en segundo plano
     print("[-] Starting Ollama background service... / Iniciando servicio en segundo plano...")
     subprocess.Popen(["ollama", "serve"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    time.sleep(5) # Esperamos 5 segundos a que arranque
+    time.sleep(5) 
 
 print("[-] Pulling model 'llama3.1' (~4.7GB if not downloaded) / Descargando modelo 'llama3.1'...")
 try:
@@ -83,11 +81,12 @@ for folder in folders:
     os.makedirs(os.path.join(base_dir, folder), exist_ok=True)
 
 files = {
+    # ¡AQUI ESTA LA CORRECCION! Sin los GUIDs falsos que rompían la red.
     r"Backend\prefabs.json": """{
-  "ussr_infantry": "{318DF1CC3A26DCE3}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_Rifleman.et",
-  "us_infantry": "{26A9756790E31D6E}Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_Rifleman.et",
-  "fia_infantry": "{84B40583F4D1B7A3}Prefabs/Characters/Factions/INDFOR/FIA/Character_FIA_Rifleman.et",
-  "ussr_btr70": "{C012BB3488BEA3C2}Prefabs/Vehicles/Wheeled/BTR70/BTR70.et"
+  "ussr_infantry": "Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_Rifleman.et",
+  "us_infantry": "Prefabs/Characters/Factions/BLUFOR/US_Army/Character_US_Rifleman.et",
+  "fia_infantry": "Prefabs/Characters/Factions/INDFOR/FIA/Character_FIA_Rifleman.et",
+  "ussr_btr70": "Prefabs/Vehicles/Wheeled/BTR70/BTR70.et"
 }""",
 
     r"Backend\main.py": """import json
