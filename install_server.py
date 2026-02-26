@@ -15,15 +15,58 @@ echo ====================================================
 echo   2. GENERANDO ARCHIVOS DEL SERVIDOR...
 echo ====================================================
 
-echo [~] Escribiendo prefabs.json...
-powershell -Command "$text = @'
-{
-  \"US Escuadra de Fusileros\": \"{DDF3799FA1387848}Prefabs/Groups/BLUFOR/Group_US_RifleSquad.et\",
-  \"US Equipo de Francotiradores\": \"{D807C7047E818488}Prefabs/Groups/BLUFOR/Group_US_SniperTeam.et\",
-  \"US Equipo de Ametralladoras\": \"{958039B857396B7B}Prefabs/Groups/BLUFOR/Group_US_MachineGunTeam.et\",
-  \"US Equipo Medico\": \"{EF62027CC75A7459}Prefabs/Groups/BLUFOR/Group_US_MedicalSection.et\"
-}
-'@; Set-Content -Path 'prefabs.json' -Value $text -Encoding UTF8"
+echo [~] Escribiendo prefabs.json (Lista Completa)...
+(
+echo {
+echo     "US Equipo de Municion": "{F72EF3429D8C8DF5}Prefabs/Groups/BLUFOR/Group_US_AmmoTeam.et",
+echo     "US Equipo de Ingenieros": "{6B2A6EE5002D200F}Prefabs/Groups/BLUFOR/Group_US_EngineerTeam.et",
+echo     "US Escuadra de Fuego": "{84E5BBAB25EA23E5}Prefabs/Groups/BLUFOR/Group_US_FireTeam.et",
+echo     "US Equipo de Ametralladoras": "{958039B857396B7B}Prefabs/Groups/BLUFOR/Group_US_MachineGunTeam.et",
+echo     "US Equipo de Guardia": "{0A8E20F50DA233E1}Prefabs/Groups/BLUFOR/Group_US_FireTeam_Guard.et",
+echo     "US Seccion Medica": "{EF62027CC75A7459}Prefabs/Groups/BLUFOR/Group_US_MedicalSection.et",
+echo     "US Equipo de Reconocimiento": "{F65B7BB712F46FEE}Prefabs/Groups/BLUFOR/Group_US_ReconTeam.et",
+echo     "US Equipo de Centinelas": "{3BF36BDEEB33AEC9}Prefabs/Groups/BLUFOR/Group_US_SentryTeam.et",
+echo     "US Escuadra de Fusileros": "{DDF3799FA1387848}Prefabs/Groups/BLUFOR/Group_US_RifleSquad.et",
+echo     "US Equipo de Francotiradores": "{D807C7047E818488}Prefabs/Groups/BLUFOR/Group_US_SniperTeam.et",
+echo     "US Equipo de Fuego Ligero": "{FCF7F5DC4F83955C}Prefabs/Groups/BLUFOR/Group_US_LightFireTeam.et",
+echo     "US Cuartel de Peloton": "{B7AB5D3F8A7ADAE4}Prefabs/Groups/BLUFOR/Group_US_PlatoonHQ.et",
+echo     "US Equipo de Zapadores": "{9624D2B39397E148}Prefabs/Groups/BLUFOR/Group_US_SapperTeam.et",
+echo     "US Equipo de Lanzagranadas": "{DE747BC9217D383C}Prefabs/Groups/BLUFOR/Group_US_Team_GL.et",
+echo     "US Equipo Antitanque Ligero": "{FAEA8B9E1252F56E}Prefabs/Groups/BLUFOR/Group_US_Team_LAT.et",
+echo     "US Equipo de Supresion": "{81B6DBF2B88545F5}Prefabs/Groups/BLUFOR/Group_US_Team_Suppress.et",
+echo     "US Equipo de Transporte": "{727C134094032B1F}Prefabs/Groups/BLUFOR/Group_US_Transport.et"
+echo }
+) > prefabs.json
+
+echo [~] Escribiendo LANZAR_IA.bat (Configuracion del ZIP)...
+(
+echo @echo off
+echo title Arma Reforger IA - MODO COMANDANTE
+echo setlocal
+echo cd /d "%%~dp0"
+echo echo ==============================================
+echo echo    SISTEMA TACTICO IA - ARMA REFORGER
+echo echo ==============================================
+echo echo.
+echo echo [+] Abriendo Panel de Control...
+echo if exist "Web\index.html" ^(
+echo     start "" "Web\index.html"
+echo ^) else ^(
+echo     echo [!] ERROR: No encuentro Web\index.html
+echo ^)
+echo echo [+] Entrando en la carpeta Backend...
+echo if exist "Backend" ^(
+echo     cd Backend
+echo ^) else ^(
+echo     echo [!] ERROR: No encuentro la carpeta Backend
+echo     pause
+echo     exit
+echo ^)
+echo echo [+] Iniciando Servidor Uvicorn...
+echo python -m uvicorn main:app --host 0.0.0.0 --port 8000
+echo echo.
+echo pause
+) > LANZAR_IA.bat
 
 echo [~] Escribiendo Backend\main.py...
 powershell -Command "$text = @'
@@ -80,7 +123,7 @@ async def ask_ollama(prompt):
     payload = {'model': 'llama3.1', 'prompt': prompt, 'system': sys_prompt, 'stream': False, 'format': 'json'}
     async with httpx.AsyncClient() as client:
         try:
-            r = await client.post('http://localhost:11434/api/generate', json=payload, timeout=30.0)
+            r = await client.post('http://localhost:11434/api/generate', json=payload, timeout=40.0)
             data = json.loads(r.json()['response'])
             uid = data.get('unit_id')
             gx, gz = data.get('grid_x', -1), data.get('grid_z', -1)
@@ -122,23 +165,23 @@ powershell -Command "$text = @'
 <html lang=\"es\">
 <head>
     <meta charset=\"UTF-8\">
-    <title>Panel de Mando - AI Game Master</title>
+    <title>Arma Reforger - IA Zeus</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #1e1e24; color: #fff; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: #2b2b36; padding: 20px; border-radius: 10px; }
-        h1 { color: #4CAF50; text-align: center; border-bottom: 2px solid #4CAF50; padding-bottom: 10px; }
-        .log-box { background: #111; padding: 15px; height: 350px; overflow-y: scroll; font-family: monospace; border: 1px solid #444; }
-        .log-entry { margin-bottom: 8px; padding: 8px; border-left: 4px solid #4CAF50; background: #1a1a1a; }
-        input[type=\"text\"] { width: 80%; padding: 10px; background: #000; border: 1px solid #4CAF50; color: #0f0; }
-        button { padding: 10px; background: #4CAF50; color: #fff; border: none; cursor: pointer; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #00ff00; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background-color: #1e1e1e; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,255,0,0.1); border: 1px solid #00ff00; }
+        h1 { text-align: center; font-size: 24px; letter-spacing: 2px; }
+        .log-box { background-color: #000; padding: 15px; height: 350px; overflow-y: auto; border: 1px solid #333; margin-bottom: 20px; font-family: monospace; }
+        .log-entry { margin: 5px 0; border-bottom: 1px dashed #222; padding-bottom: 5px;}
+        input[type=\"text\"] { width: calc(100% - 130px); padding: 12px; background: #000; border: 1px solid #00ff00; color: #0f0; font-size: 16px; }
+        button { padding: 12px 20px; background-color: #00ff00; color: #000; border: none; cursor: pointer; font-weight: bold; font-size: 16px; }
     </style>
 </head>
 <body>
     <div class=\"container\">
         <h1>Zeus AI Commander</h1>
         <div class=\"log-box\" id=\"logs\"></div>
-        <div style=\"display:flex; gap:10px; margin-top:10px;\">
-            <input type=\"text\" id=\"orderInput\" placeholder=\"Orden para la IA...\" onkeypress=\"if(event.key==='Enter') sendOrder()\">
+        <div>
+            <input type=\"text\" id=\"order-input\" placeholder=\"Orden para la IA...\" onkeypress=\"if(event.key==='Enter') sendOrder()\">
             <button onclick=\"sendOrder()\">Enviar</button>
         </div>
     </div>
@@ -154,9 +197,9 @@ powershell -Command "$text = @'
                     data.history.forEach(msg => {
                         const div = document.createElement('div');
                         div.className = 'log-entry';
-                        if(msg.includes('❌')) div.style.borderLeftColor = '#ff4444';
-                        else if(msg.includes('👤')) div.style.borderLeftColor = '#aaaaaa';
-                        else if(msg.includes('🧠')) div.style.borderLeftColor = '#00ffff';
+                        if(msg.includes('❌')) div.style.color = '#ff4444';
+                        else if(msg.includes('👤')) div.style.color = '#aaaaaa';
+                        else if(msg.includes('🧠')) div.style.color = '#00ffff';
                         div.textContent = msg;
                         box.appendChild(div);
                     });
@@ -166,7 +209,7 @@ powershell -Command "$text = @'
             } catch (e) {}
         }
         async function sendOrder() {
-            const input = document.getElementById('orderInput');
+            const input = document.getElementById('order-input');
             if (!input.value.trim()) return;
             const text = input.value.trim(); input.value = '';
             await fetch('http://127.0.0.1:8000/manual_command', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order: text }) });
@@ -178,21 +221,6 @@ powershell -Command "$text = @'
 </html>
 '@; Set-Content -Path 'Web\index.html' -Value $text -Encoding UTF8"
 
-echo [~] Escribiendo LANZAR_IA.bat...
-powershell -Command "$text = @'
-@echo off
-title Arma Reforger IA - MODO COMANDANTE
-setlocal
-cd /d `\"%~dp0`\"
-echo [+] Abriendo Panel de Control...
-if exist `"Web\index.html`" start `"`" `"Web\index.html`"
-echo [+] Entrando en la carpeta Backend...
-cd Backend
-echo [+] Iniciando Servidor Uvicorn...
-python -m uvicorn main:app --host 0.0.0.0 --port 8000
-pause
-'@; Set-Content -Path 'LANZAR_IA.bat' -Value $text -Encoding UTF8"
-
 echo [OK] Todos los archivos generados con exito.
 
 echo.
@@ -203,16 +231,8 @@ python -m pip install fastapi uvicorn httpx pydantic
 
 echo.
 echo ====================================================
-echo   4. VERIFICANDO OLLAMA Y MODELO...
-echo ====================================================
-ollama pull llama3.1
-
-
-
-echo.
-echo ====================================================
-echo   ¡TODO LISTO!
+echo   ¡INSTALACION Y GENERACION COMPLETA!
 echo   Se ha creado el archivo LANZAR_IA.bat
-echo   Ejecutalo para iniciar el sistema.
+echo   Ejecutalo para iniciar la Web y el Servidor.
 echo ====================================================
 pause
