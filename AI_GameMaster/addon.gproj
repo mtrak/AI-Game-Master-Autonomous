@@ -1,0 +1,27 @@
+GameProject {
+ ID "AIGameMasterMod"
+ GUID "5A1B2C3D4E5F6789"
+ TITLE "AI Game Master Autonomous"
+ Dependencies {
+  "58D0FB3206B6F859"
+ }
+ Configurations {
+  GameProjectConfig PC {
+   WorldFile "{6389AA54E6CCA0AF}worlds/GameMaster/GM_Eden_IA.ent"
+  }
+  GameProjectConfig XBOX_ONE {
+   PlatformHardware XBOX_ONE
+  }
+  GameProjectConfig XBOX_SERIES {
+   PlatformHardware XBOX_SERIES
+  }
+  GameProjectConfig PS4 {
+   PlatformHardware PS4
+  }
+  GameProjectConfig PS5 {
+   PlatformHardware PS5
+  }
+  GameProjectConfig HEADLESS {
+  }
+ }
+}
