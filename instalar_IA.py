@@ -14,13 +14,11 @@ print("=====================================================")
 # ==========================================
 # ⚙️ CONFIGURACIÓN DEL PROYECTO
 # ==========================================
-# URL directa del código fuente de tu GitHub
 REPO_URL = "https://github.com/mtrak/AI-Game-Master-Autonomous/archive/refs/heads/main.zip"
 ZIP_NAME = "repo_descargado.zip"
 EXTRACT_DIR = "temp_repo"
 
-# Configuración de IA y Librerías
-MODELO_OLLAMA = "llama3" # Cambia esto si usas otro modelo
+MODELO_OLLAMA = "llama3" 
 LIBRERIAS_PYTHON = ["fastapi", "uvicorn[standard]", "websockets", "requests"]
 
 def ejecutar_comando(comando, mensaje_exito, mensaje_error):
@@ -33,23 +31,26 @@ def ejecutar_comando(comando, mensaje_exito, mensaje_error):
         return False
 
 # ==========================================
-# 1. OBTENER CÓDIGO DESDE GITHUB
+# 1. OBTENER CÓDIGO Y SEPARAR CARPETAS
 # ==========================================
-print("\n📥 Paso 1: Clonando el proyecto desde GitHub...")
+print("\n📥 Paso 1: Descargando e instalando el proyecto...")
 try:
-    print("   -> Descargando la última versión del repositorio...")
+    print("   -> Clonando la última versión del repositorio...")
     urllib.request.urlretrieve(REPO_URL, ZIP_NAME)
     
     with zipfile.ZipFile(ZIP_NAME, 'r') as zip_ref:
         zip_ref.extractall(EXTRACT_DIR)
         
-    # La ruta dentro del zip de GitHub
-    ruta_origen = os.path.join(EXTRACT_DIR, "AI-Game-Master-Autonomous-main", "AI_GameMaster")
+    # Identificar la carpeta raíz extraída (ej: AI-Game-Master-Autonomous-main)
+    carpeta_raiz_zip = os.listdir(EXTRACT_DIR)[0]
     
-    # Movemos las carpetas (Catalogos_IA, Cerebro_IA, Web, etc.) al directorio actual
-    if os.path.exists(ruta_origen):
-        for elemento in os.listdir(ruta_origen):
-            origen = os.path.join(ruta_origen, elemento)
+    ruta_servidor = os.path.join(EXTRACT_DIR, carpeta_raiz_zip, "Servidor_Reforger")
+    ruta_addon = os.path.join(EXTRACT_DIR, carpeta_raiz_zip, "AI_GameMaster")
+
+    # --- 1A. INSTALAR EL SERVIDOR PYTHON ---
+    if os.path.exists(ruta_servidor):
+        for elemento in os.listdir(ruta_servidor):
+            origen = os.path.join(ruta_servidor, elemento)
             destino = os.path.join(os.getcwd(), elemento)
             
             if os.path.exists(destino):
@@ -57,14 +58,38 @@ try:
                 else: os.remove(destino)
                 
             shutil.move(origen, destino)
-            print(f"   -> Instalado: {elemento}")
+        print("   ✅ Backend (Servidor Python) instalado en la carpeta actual.")
+    else:
+        print("   ❌ Error: No se encontró la carpeta 'Servidor_Reforger' en GitHub.")
+
+    # --- 1B. INSTALAR EL ADDON EN EL WORKBENCH DE ARMA ---
+    if os.path.exists(ruta_addon):
+        # Buscamos la ruta de Documentos estándar de Windows
+        ruta_docs = os.path.join(os.path.expanduser('~'), 'Documents')
+        ruta_workbench = os.path.join(ruta_docs, 'My Games', 'ArmaReforgerWorkbench', 'addons', 'AI_GameMaster')
+        
+        try:
+            os.makedirs(os.path.dirname(ruta_workbench), exist_ok=True)
+            if os.path.exists(ruta_workbench):
+                shutil.rmtree(ruta_workbench) # Borra la versión vieja
             
-    # Limpiamos los archivos temporales
-    os.remove(ZIP_NAME)
-    shutil.rmtree(EXTRACT_DIR)
-    print("✅ Sistema de archivos y catálogos creados con éxito.")
+            shutil.move(ruta_addon, ruta_workbench)
+            print(f"   ✅ Addon C++ instalado automáticamente en: ArmaReforgerWorkbench/addons/")
+        except Exception as e:
+            # Si falla por permisos, lo extraemos aquí para que el usuario lo mueva a mano
+            destino_alt = os.path.join(os.getcwd(), "AI_GameMaster_Addon")
+            if os.path.exists(destino_alt): shutil.rmtree(destino_alt)
+            shutil.move(ruta_addon, destino_alt)
+            print("   ⚠️ No se pudo instalar el Addon en el Workbench automáticamente.")
+            print(f"   -> El Addon se ha guardado en la carpeta local: {destino_alt}")
+            print("   -> Por favor, cópialo a mano a tu carpeta de addons del juego.")
+
+    # Limpiamos basura
+    if os.path.exists(ZIP_NAME): os.remove(ZIP_NAME)
+    if os.path.exists(EXTRACT_DIR): shutil.rmtree(EXTRACT_DIR)
+    
 except Exception as e:
-    print(f"❌ Error al descargar desde GitHub: {e}")
+    print(f"❌ Error crítico al descargar desde GitHub: {e}")
     sys.exit(1)
 
 # ==========================================
@@ -77,7 +102,7 @@ for lib in LIBRERIAS_PYTHON:
 print("✅ Entorno de Python preparado.")
 
 # ==========================================
-# 3. INSTALAR OLLAMA (Si no existe)
+# 3. INSTALAR OLLAMA
 # ==========================================
 print("\n🦙 Paso 3: Comprobando motor de IA (Ollama)...")
 try:
@@ -108,13 +133,14 @@ ejecutar_comando(
 )
 
 # ==========================================
-# 5. CREAR ACCESO DIRECTO
+# 5. CREAR ACCESO DIRECTO (.BAT)
 # ==========================================
 print("\n🎮 Paso 5: Generando archivo de lanzamiento...")
 contenido_bat = f"""@echo off
 title AI Game Master - Servidor Tactico
+cd /d "%~dp0"
 echo Iniciando motor de IA (Ollama)...
-start /b ollama serve
+start /b ollama serve >NUL 2>NUL
 timeout /t 3 /nobreak > NUL
 echo Arrancando Servidor de Arma Reforger...
 python main.py
@@ -127,7 +153,8 @@ print("✅ Archivo 'Arrancar_IA.bat' creado.")
 print("\n=====================================================")
 print("🎉 ¡TODO LISTO! INSTALACIÓN COMPLETADA AL 100% 🎉")
 print("=====================================================")
-print("Para jugar, simplemente haz doble clic en el archivo:")
+print("1. El Addon se ha enviado a tu Workbench de Arma.")
+print("2. Para encender el panel de control web, haz doble clic en:")
 print("👉 Arrancar_IA.bat 👈")
 print("=====================================================")
 os.system("pause")
