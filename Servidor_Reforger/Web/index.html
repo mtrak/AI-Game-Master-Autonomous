@@ -2,103 +2,266 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Arma Reforger - IA Zeus</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Game Master - Monitor de Campaña</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #121212; color: #00ff00; margin: 0; padding: 20px; }
-        .dashboard { display: flex; gap: 20px; max-width: 1200px; margin: 0 auto; }
-        .panel { background-color: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #00ff00; box-shadow: 0 4px 6px rgba(0,255,0,0.1); }
-        .chat-panel { flex: 2; }
-        .radar-panel { flex: 1; }
-        .log-box { background-color: #000; padding: 15px; height: 350px; overflow-y: auto; border: 1px solid #333; margin-bottom: 20px; font-family: monospace; }
-        .troop-box { background-color: #000; padding: 10px; height: 385px; overflow-y: auto; border: 1px solid #333; font-family: monospace; font-size: 14px; }
-        .log-entry { margin: 5px 0; border-bottom: 1px dashed #222; padding-bottom: 5px; }
-        .troop-entry { margin: 5px 0; color: #ffb800; border-bottom: 1px solid #333; padding-bottom: 5px; }
-        input[type="text"] { padding: 12px; background: #000; border: 1px solid #00ff00; color: #0f0; font-size: 16px; box-sizing: border-box; }
-        button { padding: 12px 20px; background-color: #00ff00; color: #000; border: none; cursor: pointer; font-weight: bold; font-size: 16px; }
-        button:hover { background-color: #33ff33; }
-        h1, h2 { text-align: center; margin-top: 0;}
+        :root {
+            --bg-color: #0d1117;
+            --panel-bg: #161b22;
+            --border-color: #30363d;
+            --text-main: #c9d1d9;
+            --accent-blue: #58a6ff;
+            --accent-green: #2ea043;
+            --accent-red: #f85149;
+            --accent-orange: #d29922;
+            --accent-purple: #bc8cff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            height: 95vh;
+            box-sizing: border-box;
+        }
+
+        h1, h2, h3 { margin-top: 0; color: #fff; }
+
+        .panel {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .left-col { display: flex; flex-direction: column; gap: 20px; }
+        
+        #chat-window {
+            flex-grow: 1;
+            overflow-y: auto;
+            background: #000;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            border: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .log-entry { margin-bottom: 8px; line-height: 1.4; border-bottom: 1px solid #222; padding-bottom: 4px; }
+        .log-user { color: var(--accent-blue); }
+        .log-ia { color: var(--accent-green); }
+        .log-sys { color: var(--accent-orange); }
+        .log-red { color: var(--accent-red); font-weight: bold;}
+        .log-purple { color: var(--accent-purple); font-weight: bold;}
+
+        .input-area { display: flex; gap: 10px; margin-top: 10px; }
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: #000;
+            color: #fff;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            background-color: var(--accent-blue);
+            color: #000;
+        }
+        button:hover { background-color: #3182ce; }
+        
+        .btn-danger { background-color: var(--accent-red); color: #fff; }
+        .btn-danger:hover { background-color: #c53030; }
+
+        .right-col { display: flex; flex-direction: column; gap: 20px; }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .online { background-color: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+        .offline { background-color: var(--accent-red); box-shadow: 0 0 8px var(--accent-red); }
+        .loading { background-color: var(--accent-orange); box-shadow: 0 0 8px var(--accent-orange); }
+        
+        .fase-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .fase-iniciando { background: #30363d; color: #fff; }
+        .fase-desplegando { background: var(--accent-orange); color: #000; }
+        .fase-ia { background: var(--accent-purple); color: #000; }
+
+        .radar-list { list-style: none; padding: 0; margin: 0; font-size: 13px; }
+        .radar-list li { padding: 8px 0; border-bottom: 1px solid var(--border-color); line-height: 1.4; }
     </style>
 </head>
 <body>
-    <div class="dashboard">
-        <div class="panel chat-panel">
-            <h1>📻 Centro de Mando Zeus</h1>
-            <div class="log-box" id="logs"></div>
-            <div style="display: flex; gap: 10px;">
-                <input type="text" id="playerName" placeholder="Nombre..." style="width: 25%;" value="Raulote">
-                <input type="text" id="order-input" placeholder="Ej: Crea un BTR / Mueve la ID 3 hacia mi..." style="width: 60%;" onkeypress="if(event.key==='Enter') sendOrder()">
-                <button onclick="sendOrder()">Enviar</button>
-            </div>
-        </div>
 
-        <div class="panel radar-panel">
-            <h2 style="color: #00ffff;">🛰️ Radar Activo</h2>
-            <div class="troop-box" id="troops">
-                Cargando satélite...
+    <div class="left-col">
+        <div class="panel" style="flex-grow: 1;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>🖥️ Log de Eventos de Campaña</h2>
+                <div id="fase-badge" class="fase-badge fase-iniciando">FASE: INICIANDO</div>
+            </div>
+            <div id="chat-window"></div>
+            <div class="input-area">
+                <input type="text" id="cmd-input" placeholder="Comando manual de emergencia (Zeus)..." onkeypress="handleEnter(event)">
+                <button onclick="sendManualCommand()">Ajustar</button>
             </div>
         </div>
     </div>
 
-    <script>
-        let lastLength = 0;
+    <div class="right-col">
+        <div class="panel">
+            <h3>Conexión Enfusion</h3>
+            <div style="margin-bottom: 10px;">
+                <span id="status-dot" class="status-indicator offline"></span>
+                <span id="status-text">Buscando servidor...</span>
+            </div>
+            <div style="font-size: 13px; margin-top: 10px; padding: 10px; background: #000; border-radius: 5px; border-left: 3px solid var(--accent-blue);">
+                <strong>Cola de Renderizado:</strong><br>
+                <span id="queue-size" style="font-weight: bold; font-size: 18px;">0</span> entidades en spooler.
+            </div>
+        </div>
+        
+        <div class="panel">
+            <h3 style="color: var(--accent-red); margin-bottom: 5px;">🚨 Test de Combate</h3>
+            <p style="font-size: 11px; color: gray; margin-top: 0;">Simula la señal de radio al detectar disparos.</p>
+            <div style="display: flex; gap: 5px;">
+                <input type="number" id="test-unit-id" placeholder="ID" style="width: 60px; padding: 5px;">
+                <button class="btn-danger" style="flex-grow: 1;" onclick="simulateCombat()">Bajo Fuego!</button>
+            </div>
+        </div>
 
-        async function fetchLogs() {
+        <div class="panel" style="flex-grow: 1; overflow-y: auto;">
+            <h3>📡 Radar Zeus</h3>
+            <ul id="troops-list" class="radar-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Mantenemos la ruta absoluta porque estás abriendo un archivo file:///
+        // Si pusiéramos ruta relativa, fallaría.
+        const API_URL = "http://127.0.0.1:8000"; 
+
+        setInterval(async () => {
             try {
-                const res = await fetch('http://127.0.0.1:8000/status');
+                const res = await fetch(`${API_URL}/status`);
                 const data = await res.json();
                 
-                // Actualizar Logs
-                if (data.history.length !== lastLength) {
-                    const box = document.getElementById('logs');
-                    box.innerHTML = '';
-                    data.history.forEach(msg => {
-                        const div = document.createElement('div');
-                        div.className = 'log-entry';
-                        if(msg.includes('❌') || msg.includes('⛔')) div.style.color = '#ff4444';
-                        else if(msg.includes('👤') || msg.includes('📻')) div.style.color = '#aaaaaa';
-                        else if(msg.includes('🧠')) div.style.color = '#00ffff';
-                        div.textContent = msg;
-                        box.appendChild(div);
-                    });
-                    lastLength = data.history.length;
-                    box.scrollTop = box.scrollHeight; 
-                }
-
-                // Actualizar Radar de Tropas
-                const tBox = document.getElementById('troops');
-                tBox.innerHTML = '';
-                if(data.troops.length === 0) {
-                    tBox.innerHTML = '<span style="color:#555;">No hay fuerzas en el área.</span>';
+                const dot = document.getElementById('status-dot');
+                const text = document.getElementById('status-text');
+                const badge = document.getElementById('fase-badge');
+                
+                if(data.arma_connected) {
+                    if(data.queue_size > 0 && data.fase === "DESPLEGANDO") {
+                        dot.className = "status-indicator loading";
+                        text.innerText = "Arma Reforger: INYECTANDO MISION";
+                    } else {
+                        dot.className = "status-indicator online";
+                        text.innerText = "Arma Reforger: ESTABLE";
+                    }
                 } else {
-                    data.troops.forEach(t => {
-                        const tDiv = document.createElement('div');
-                        tDiv.className = 'troop-entry';
-                        tDiv.innerHTML = `<strong>[ID: ${t.id}]</strong> ${t.name}<br><span style="color:#888;">Pos: X:${Math.round(t.x)} Z:${Math.round(t.z)}</span>`;
-                        tBox.appendChild(tDiv);
-                    });
+                    dot.className = "status-indicator offline";
+                    text.innerText = "Arma Reforger: SIN CONEXIÓN";
                 }
-            } catch (e) {}
+
+                badge.innerText = "FASE: " + data.fase;
+                if(data.fase === "INICIANDO") badge.className = "fase-badge fase-iniciando";
+                if(data.fase === "DESPLEGANDO") badge.className = "fase-badge fase-desplegando";
+                if(data.fase === "IA_AL_MANDO") badge.className = "fase-badge fase-ia";
+
+                document.getElementById('queue-size').innerText = data.queue_size;
+                if(data.queue_size > 0) {
+                    document.getElementById('queue-size').style.color = "var(--accent-orange)";
+                } else {
+                    document.getElementById('queue-size').style.color = "var(--accent-green)";
+                }
+
+                const chatWin = document.getElementById('chat-window');
+                chatWin.innerHTML = "";
+                data.history.forEach(line => {
+                    let cssClass = "log-sys";
+                    if(line.includes("👤")) cssClass = "log-user";
+                    if(line.includes("⏳") || line.includes("✅")) cssClass = "log-ia";
+                    if(line.includes("⛔")) cssClass = "log-red";
+                    if(line.includes("RADIO") || line.includes("ALERTA")) cssClass = "log-red";
+                    if(line.includes("IA (Mundo Vivo)")) cssClass = "log-purple";
+                    chatWin.innerHTML += `<div class="log-entry ${cssClass}">${line}</div>`;
+                });
+                chatWin.scrollTop = chatWin.scrollHeight;
+
+                const list = document.getElementById('troops-list');
+                list.innerHTML = "";
+                data.troops.forEach(t => {
+                    let colorStatus = t.action === "IDLE" ? "gray" : (t.action.includes("RESCATE") ? "#f85149" : "#58a6ff");
+                    list.innerHTML += `
+                        <li>
+                            <strong>[#${t.id}]</strong> ${t.name} <br>
+                            <small style="color:${colorStatus};">Acción: ${t.action}</small><br>
+                            <small style="color:#bc8cff;">📍 <strong>${t.city}</strong> (X:${Math.round(t.x)} Z:${Math.round(t.z)})</small>
+                        </li>`;
+                });
+
+            } catch(e) {
+                document.getElementById('status-dot').className = "status-indicator offline";
+                document.getElementById('status-text').innerText = "Python: APAGADO";
+            }
+        }, 2000);
+
+        async function sendCommand(cmdText) {
+            try {
+                await fetch(`${API_URL}/manual_command`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ player_name: "Comandante", order: cmdText })
+                });
+            } catch(e) {
+                console.error("Error", e);
+            }
         }
 
-        async function sendOrder() {
-            const input = document.getElementById('order-input');
-            const nameInput = document.getElementById('playerName');
-            if (!input.value.trim() || !nameInput.value.trim()) return;
-            
-            const text = input.value.trim(); 
-            const pName = nameInput.value.trim();
-            input.value = '';
-            
-            await fetch('http://127.0.0.1:8000/manual_command', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ player_name: pName, order: text }) 
-            });
-            fetchLogs(); 
+        function sendManualCommand() {
+            const input = document.getElementById('cmd-input');
+            if(input.value.trim() !== "") {
+                sendCommand(input.value);
+                input.value = "";
+            }
         }
 
-        setInterval(fetchLogs, 1000); 
-        fetchLogs();
+        function handleEnter(e) {
+            if(e.key === 'Enter') sendManualCommand();
+        }
+
+        async function simulateCombat() {
+            const unitId = document.getElementById('test-unit-id').value;
+            if(!unitId) return alert("Introduce la ID de una tropa activa");
+            
+            try {
+                await fetch(`${API_URL}/combat_alert?unit_id=${unitId}`);
+                document.getElementById('test-unit-id').value = "";
+            } catch(e) {
+                console.error("Error simulando combate", e);
+            }
+        }
     </script>
 </body>
-</html>
