@@ -24,10 +24,11 @@
             margin: 0;
             padding: 20px;
             display: grid;
-            grid-template-columns: 1fr 300px;
+            grid-template-columns: 1fr 320px;
             gap: 20px;
-            height: 95vh;
+            min-height: 100vh; 
             box-sizing: border-box;
+            overflow-y: auto;
         }
 
         h1, h2, h3 { margin-top: 0; color: #fff; }
@@ -41,7 +42,7 @@
             flex-direction: column;
         }
 
-        .left-col { display: flex; flex-direction: column; gap: 20px; }
+        .left-col { display: flex; flex-direction: column; gap: 20px; min-height: 600px;}
         
         #chat-window {
             flex-grow: 1;
@@ -52,6 +53,7 @@
             font-family: 'Courier New', Courier, monospace;
             border: 1px solid var(--border-color);
             font-size: 14px;
+            min-height: 400px;
         }
 
         .log-entry { margin-bottom: 8px; line-height: 1.4; border-bottom: 1px solid #222; padding-bottom: 4px; }
@@ -159,8 +161,7 @@
     </div>
 
     <script>
-        // Mantenemos la ruta absoluta porque estás abriendo un archivo file:///
-        // Si pusiéramos ruta relativa, fallaría.
+        // Ruta absoluta obligatoria para que el archivo local file:/// se conecte al Python local
         const API_URL = "http://127.0.0.1:8000"; 
 
         setInterval(async () => {
@@ -205,7 +206,7 @@
                     if(line.includes("⏳") || line.includes("✅")) cssClass = "log-ia";
                     if(line.includes("⛔")) cssClass = "log-red";
                     if(line.includes("RADIO") || line.includes("ALERTA")) cssClass = "log-red";
-                    if(line.includes("IA (Mundo Vivo)")) cssClass = "log-purple";
+                    if(line.includes("IA (Comandante)")) cssClass = "log-purple";
                     chatWin.innerHTML += `<div class="log-entry ${cssClass}">${line}</div>`;
                 });
                 chatWin.scrollTop = chatWin.scrollHeight;
@@ -213,7 +214,7 @@
                 const list = document.getElementById('troops-list');
                 list.innerHTML = "";
                 data.troops.forEach(t => {
-                    let colorStatus = t.action === "IDLE" ? "gray" : (t.action.includes("RESCATE") ? "#f85149" : "#58a6ff");
+                    let colorStatus = t.action === "ESPERANDO ORDENES" ? "gray" : (t.action.includes("RESCATE") ? "#f85149" : "#58a6ff");
                     list.innerHTML += `
                         <li>
                             <strong>[#${t.id}]</strong> ${t.name} <br>
@@ -265,3 +266,4 @@
         }
     </script>
 </body>
+</html>
