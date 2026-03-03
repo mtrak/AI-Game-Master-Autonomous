@@ -18,7 +18,7 @@ REPO_URL = "https://github.com/mtrak/AI-Game-Master-Autonomous/archive/refs/head
 ZIP_NAME = "repo_descargado.zip"
 EXTRACT_DIR = "temp_repo"
 
-MODELO_OLLAMA = "llama3" 
+MODELO_OLLAMA = "llama3.1:latest" 
 LIBRERIAS_PYTHON = ["fastapi", "uvicorn[standard]", "websockets", "requests"]
 
 def ejecutar_comando(comando, mensaje_exito, mensaje_error):
@@ -41,13 +41,11 @@ try:
     with zipfile.ZipFile(ZIP_NAME, 'r') as zip_ref:
         zip_ref.extractall(EXTRACT_DIR)
         
-    # Identificar la carpeta raíz extraída (ej: AI-Game-Master-Autonomous-main)
     carpeta_raiz_zip = os.listdir(EXTRACT_DIR)[0]
     
     ruta_servidor = os.path.join(EXTRACT_DIR, carpeta_raiz_zip, "Servidor_Reforger")
     ruta_addon = os.path.join(EXTRACT_DIR, carpeta_raiz_zip, "AI_GameMaster")
 
-    # --- 1A. INSTALAR EL SERVIDOR PYTHON ---
     if os.path.exists(ruta_servidor):
         for elemento in os.listdir(ruta_servidor):
             origen = os.path.join(ruta_servidor, elemento)
@@ -62,21 +60,18 @@ try:
     else:
         print("   ❌ Error: No se encontró la carpeta 'Servidor_Reforger' en GitHub.")
 
-    # --- 1B. INSTALAR EL ADDON EN EL WORKBENCH DE ARMA ---
     if os.path.exists(ruta_addon):
-        # Buscamos la ruta de Documentos estándar de Windows
         ruta_docs = os.path.join(os.path.expanduser('~'), 'Documents')
         ruta_workbench = os.path.join(ruta_docs, 'My Games', 'ArmaReforgerWorkbench', 'addons', 'AI_GameMaster')
         
         try:
             os.makedirs(os.path.dirname(ruta_workbench), exist_ok=True)
             if os.path.exists(ruta_workbench):
-                shutil.rmtree(ruta_workbench) # Borra la versión vieja
+                shutil.rmtree(ruta_workbench) 
             
             shutil.move(ruta_addon, ruta_workbench)
-            print(f"   ✅ Addon C++ instalado automáticamente en: ArmaReforgerWorkbench/addons/")
+            print(f"   ✅ Addon C++ instalado automáticamente en: ArmaReforgerWorkbench/addons/AI_GameMaster")
         except Exception as e:
-            # Si falla por permisos, lo extraemos aquí para que el usuario lo mueva a mano
             destino_alt = os.path.join(os.getcwd(), "AI_GameMaster_Addon")
             if os.path.exists(destino_alt): shutil.rmtree(destino_alt)
             shutil.move(ruta_addon, destino_alt)
@@ -84,7 +79,6 @@ try:
             print(f"   -> El Addon se ha guardado en la carpeta local: {destino_alt}")
             print("   -> Por favor, cópialo a mano a tu carpeta de addons del juego.")
 
-    # Limpiamos basura
     if os.path.exists(ZIP_NAME): os.remove(ZIP_NAME)
     if os.path.exists(EXTRACT_DIR): shutil.rmtree(EXTRACT_DIR)
     
@@ -95,7 +89,7 @@ except Exception as e:
 # ==========================================
 # 2. INSTALAR DEPENDENCIAS DE PYTHON
 # ==========================================
-print("\n🐍 Paso 2: Instalando librerías de red...")
+print("\n🐍 Paso 2: Instalando librerías de red (incluyendo requests)...")
 for lib in LIBRERIAS_PYTHON:
     print(f"   -> Instalando {lib}...")
     subprocess.check_call([sys.executable, "-m", "pip", "install", lib], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -129,26 +123,33 @@ print("   -> Esto puede tardar unos minutos dependiendo de tu internet. ¡Pacien
 ejecutar_comando(
     ["ollama", "pull", MODELO_OLLAMA],
     f"Modelo '{MODELO_OLLAMA}' descargado y listo.",
-    "Error al descargar la IA. Asegúrate de tener internet."
+    "Error al descargar la IA. Asegúrate de tener internet y de que Ollama se esté ejecutando en segundo plano."
 )
 
 # ==========================================
-# 5. CREAR ACCESO DIRECTO (.BAT)
+# 5. CREAR ACCESO DIRECTO (.BAT) BLINDADO
 # ==========================================
 print("\n🎮 Paso 5: Generando archivo de lanzamiento...")
+ruta_python_exacta = sys.executable # 🔥 AQUI ESTA LA MAGIA: Coge la ruta absoluta del Python correcto
+
 contenido_bat = f"""@echo off
 title AI Game Master - Servidor Tactico
+color 0A
 cd /d "%~dp0"
-echo Iniciando motor de IA (Ollama)...
+echo ==============================================
+echo    ARRANCANDO SISTEMA TACTICO IA
+echo ==============================================
+echo.
+echo [+] Iniciando motor de IA local (Ollama)...
 start /b ollama serve >NUL 2>NUL
 timeout /t 3 /nobreak > NUL
-echo Arrancando Servidor de Arma Reforger...
-python main.py
+echo [+] Arrancando Servidor Web con el Python correcto...
+"{ruta_python_exacta}" main.py
 pause
 """
 with open("Arrancar_IA.bat", "w") as f:
     f.write(contenido_bat)
-print("✅ Archivo 'Arrancar_IA.bat' creado.")
+print("✅ Archivo 'Arrancar_IA.bat' creado con la ruta de Python blindada.")
 
 print("\n=====================================================")
 print("🎉 ¡TODO LISTO! INSTALACIÓN COMPLETADA AL 100% 🎉")
