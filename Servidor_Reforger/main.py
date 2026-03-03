@@ -48,7 +48,7 @@ OLLAMA_URL = "http://localhost:11434/api/generate"
 MODELO_OLLAMA = "llama3.1:latest"
 
 # 2. Configuración OPENAI (Nube, De pago, Estrategia Avanzada)
-OPENAI_API_KEY = "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"
+OPENAI_API_KEY = "API_KEY_HERE"
 MODELO_OPENAI = "gpt-5.1-2025-11-13" 
 
 # Tiempos de la partida
