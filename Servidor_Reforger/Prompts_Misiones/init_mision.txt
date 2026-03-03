@@ -1,0 +1,8 @@
+ESCENARIO DE GUERRA TOTAL: Conflicto abierto a gran escala entre Estados Unidos (US) y la Unión Soviética (USSR) por el control absoluto de Everon.
+
+- FACCIÓN US (Atacantes): Despliega fuerzas americanas asaltando las zonas sur y este de la isla (Lamentin, Tyrone, Le Moule). Debes incluir escuadrones de infantería americana, vehículos artillados patrullando las zonas, y helicópteros de Estados Unidos sobrevolando el espacio aéreo.
+
+- FACCIÓN USSR (Defensores): Despliega fuerzas soviéticas defendiendo férreamente el norte y centro (Morton, Montignac, Durras, Saint Pierre). Atrinchera infantería pesada rusa en los pueblos, pon vehículos blindados rusos a patrullar las calles, y despliega helicópteros soviéticos de combate en el aire.
+
+- INSTRUCCIÓN TÁCTICA: Crea un frente de batalla caótico. Mezcla obligatoriamente en tus órdenes tropas a pie, múltiples vehículos mecanizados en movimiento y helicópteros de ambas facciones activos desde el primer instante.
+despliega al menos 80 unidades

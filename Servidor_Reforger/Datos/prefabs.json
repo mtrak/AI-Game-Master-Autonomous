@@ -1,0 +1,19 @@
+{
+    "US Equipo de Municion": "{F72EF3429D8C8DF5}Prefabs/Groups/BLUFOR/Group_US_AmmoTeam.et",
+    "US Equipo de Ingenieros": "{6B2A6EE5002D200F}Prefabs/Groups/BLUFOR/Group_US_EngineerTeam.et",
+    "US Escuadra de Fuego": "{84E5BBAB25EA23E5}Prefabs/Groups/BLUFOR/Group_US_FireTeam.et",
+    "US Equipo de Ametralladoras": "{958039B857396B7B}Prefabs/Groups/BLUFOR/Group_US_MachineGunTeam.et",
+    "US Equipo de Guardia": "{0A8E20F50DA233E1}Prefabs/Groups/BLUFOR/Group_US_FireTeam_Guard.et",
+    "US Seccion Medica": "{EF62027CC75A7459}Prefabs/Groups/BLUFOR/Group_US_MedicalSection.et",
+    "US Equipo de Reconocimiento": "{F65B7BB712F46FEE}Prefabs/Groups/BLUFOR/Group_US_ReconTeam.et",
+    "US Equipo de Centinelas": "{3BF36BDEEB33AEC9}Prefabs/Groups/BLUFOR/Group_US_SentryTeam.et",
+    "US Escuadra de Fusileros": "{DDF3799FA1387848}Prefabs/Groups/BLUFOR/Group_US_RifleSquad.et",
+    "US Equipo de Francotiradores": "{D807C7047E818488}Prefabs/Groups/BLUFOR/Group_US_SniperTeam.et",
+    "US Equipo de Fuego Ligero": "{FCF7F5DC4F83955C}Prefabs/Groups/BLUFOR/Group_US_LightFireTeam.et",
+    "US Cuartel de Peloton": "{B7AB5D3F8A7ADAE4}Prefabs/Groups/BLUFOR/Group_US_PlatoonHQ.et",
+    "US Equipo de Zapadores": "{9624D2B39397E148}Prefabs/Groups/BLUFOR/Group_US_SapperTeam.et",
+    "US Equipo de Lanzagranadas": "{DE747BC9217D383C}Prefabs/Groups/BLUFOR/Group_US_Team_GL.et",
+    "US Equipo Antitanque Ligero": "{FAEA8B9E1252F56E}Prefabs/Groups/BLUFOR/Group_US_Team_LAT.et",
+    "US Equipo de Supresion": "{81B6DBF2B88545F5}Prefabs/Groups/BLUFOR/Group_US_Team_Suppress.et",
+    "US Equipo de Transporte": "{727C134094032B1F}Prefabs/Groups/BLUFOR/Group_US_Transport.et"
+}
