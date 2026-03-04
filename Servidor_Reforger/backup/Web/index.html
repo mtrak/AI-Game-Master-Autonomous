@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Arma Reforger - IA Zeus</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #121212; color: #00ff00; margin: 0; padding: 20px; }
+        .dashboard { display: flex; gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .panel { background-color: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #00ff00; box-shadow: 0 4px 6px rgba(0,255,0,0.1); }
+        .chat-panel { flex: 2; }
+        .radar-panel { flex: 1; }
+        .log-box { background-color: #000; padding: 15px; height: 350px; overflow-y: auto; border: 1px solid #333; margin-bottom: 20px; font-family: monospace; }
+        .troop-box { background-color: #000; padding: 10px; height: 385px; overflow-y: auto; border: 1px solid #333; font-family: monospace; font-size: 14px; }
+        .log-entry { margin: 5px 0; border-bottom: 1px dashed #222; padding-bottom: 5px; }
+        .troop-entry { margin: 5px 0; color: #ffb800; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        input[type="text"] { padding: 12px; background: #000; border: 1px solid #00ff00; color: #0f0; font-size: 16px; box-sizing: border-box; }
+        button { padding: 12px 20px; background-color: #00ff00; color: #000; border: none; cursor: pointer; font-weight: bold; font-size: 16px; }
+        button:hover { background-color: #33ff33; }
+        h1, h2 { text-align: center; margin-top: 0;}
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="panel chat-panel">
+            <h1>📻 Centro de Mando Zeus</h1>
+            <div class="log-box" id="logs"></div>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="playerName" placeholder="Nombre..." style="width: 25%;" value="Raulote">
+                <input type="text" id="order-input" placeholder="Ej: Crea un BTR / Mueve la ID 3 hacia mi..." style="width: 60%;" onkeypress="if(event.key==='Enter') sendOrder()">
+                <button onclick="sendOrder()">Enviar</button>
+            </div>
+        </div>
+
+        <div class="panel radar-panel">
+            <h2 style="color: #00ffff;">🛰️ Radar Activo</h2>
+            <div class="troop-box" id="troops">
+                Cargando satélite...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let lastLength = 0;
+
+        async function fetchLogs() {
+            try {
+                const res = await fetch('http://127.0.0.1:8000/status');
+                const data = await res.json();
+                
+                // Actualizar Logs
+                if (data.history.length !== lastLength) {
+                    const box = document.getElementById('logs');
+                    box.innerHTML = '';
+                    data.history.forEach(msg => {
+                        const div = document.createElement('div');
+                        div.className = 'log-entry';
+                        if(msg.includes('❌') || msg.includes('⛔')) div.style.color = '#ff4444';
+                        else if(msg.includes('👤') || msg.includes('📻')) div.style.color = '#aaaaaa';
+                        else if(msg.includes('🧠')) div.style.color = '#00ffff';
+                        div.textContent = msg;
+                        box.appendChild(div);
+                    });
+                    lastLength = data.history.length;
+                    box.scrollTop = box.scrollHeight; 
+                }
+
+                // Actualizar Radar de Tropas
+                const tBox = document.getElementById('troops');
+                tBox.innerHTML = '';
+                if(data.troops.length === 0) {
+                    tBox.innerHTML = '<span style="color:#555;">No hay fuerzas en el área.</span>';
+                } else {
+                    data.troops.forEach(t => {
+                        const tDiv = document.createElement('div');
+                        tDiv.className = 'troop-entry';
+                        tDiv.innerHTML = `<strong>[ID: ${t.id}]</strong> ${t.name}<br><span style="color:#888;">Pos: X:${Math.round(t.x)} Z:${Math.round(t.z)}</span>`;
+                        tBox.appendChild(tDiv);
+                    });
+                }
+            } catch (e) {}
+        }
+
+        async function sendOrder() {
+            const input = document.getElementById('order-input');
+            const nameInput = document.getElementById('playerName');
+            if (!input.value.trim() || !nameInput.value.trim()) return;
+            
+            const text = input.value.trim(); 
+            const pName = nameInput.value.trim();
+            input.value = '';
+            
+            await fetch('http://127.0.0.1:8000/manual_command', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ player_name: pName, order: text }) 
+            });
+            fetchLogs(); 
+        }
+
+        setInterval(fetchLogs, 1000); 
+        fetchLogs();
+    </script>
+</body>
+</html>

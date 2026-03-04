@@ -1,0 +1,7 @@
+ESCENARIO DE CACERÍA MASIVA Y SUPERVIVENCIA. 
+
+El jugador está completamente solo, aislado tras las líneas enemigas, y su único objetivo es sobrevivir y huir de la isla de Everon. 
+
+La facción Rusa (USSR) ha detectado su presencia, ha declarado el estado de máxima alerta y ha movilizado a todo su ejército para cazarlo sin piedad. La escala del conflicto es MASIVA y requiere el despliegue de decenas de formaciones de combate.
+
+El jugador es la presa. Despliega múltiples Escuadrones de Fuerzas Especiales rusas, Pelotones de Infantería barriendo los bosques, Patrullas Motorizadas rusas cortando las carreteras principales entre los pueblos, y Helicópteros Tripulados sobrevolando la zona. Todas las entidades deben estar enfocadas en patrullar de forma agresiva y buscar y destruir por toda la isla.
